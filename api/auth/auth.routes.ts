@@ -9,22 +9,37 @@ import { clearCamps } from '../../middlewares/clear-camps'
 export const router = Router()
 
 // ROUTES
-router.post('/', loginPost)
+router.post(
+    '/login',
+    [
+        check('email', 'Name is required').notEmpty(),
+        check('password', 'lastName is required').notEmpty(),
+        validateCamps,
+        check('email', 'Email is required').isEmail(),
+        check('password', 'Password need to be more than 6 char').isLength({
+            min: 6,
+        }),
+        validateCamps,
+    ],
+    loginPost
+)
 router.post(
     '/register',
     [
+        check('name', 'Name is required').notEmpty(),
+        check('lastName', 'lastName is required').notEmpty(),
+
+        check('email', 'Email is required').notEmpty(),
+        check('password', 'Password is required').notEmpty(),
+        check('phone', 'The phone is required').notEmpty(),
+        validateCamps,
         check('name', 'Name is required').isString(),
+        check('lastName', 'lastName is required').isString(),
         check('email', 'Email is required').isEmail(),
-        check('password', 'Password need to be more than 5 char').isLength({
+        check('password', 'Password need to be more than 6 char').isLength({
             min: 6,
         }),
-        check('phone', 'The phone is required').notEmpty(),
         check('phone', 'phone is required').isNumeric(),
-        check('street', 'The street is required').isString(),
-        check('apartament', 'The apartament is required').isString(),
-        check('city', 'The city is required').isString(),
-        check('zip', 'The zip is required').isString(),
-        check('country', 'The country is required').isString(),
         validateCamps,
         check('email').custom(validateEmail).withMessage('Email is in used'),
         validateCamps,
@@ -32,4 +47,3 @@ router.post(
     ],
     registerPost
 )
-

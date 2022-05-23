@@ -46,28 +46,17 @@ export const loginPost = async (req: Request, res: Response) => {
 export const registerPost = async (req: Request, res: Response) => {
   const {
       password: noHashPassword,
-      street,
-      apartament,
-      city,
-      zip,
-      country,
+
       ...rest
   } = req.body
 
-  const address = {
-      street,
-      apartament,
-      city,
-      zip,
-      country,
-  }
+
 
   const salt = bcrypt.genSaltSync(7)
   const password = bcrypt.hashSync(noHashPassword, salt)
 
   const user = new User({
       ...rest,
-      address,
       password,
   })
 
@@ -78,54 +67,3 @@ export const registerPost = async (req: Request, res: Response) => {
       msg: ['User created succesful'],
   })
 }
-// export const renewJWTGet = async (req: Request, res: Response) => {
-
-//   const {user} = req
-  
-//   const token = await generateJWT(user!.id)
-  
-//   return res.status(200).json({
-//     ok: true,
-//     msg: ["Renew token Sucessful"],
-//     result: [],
-//     token
-//   });
-// };
-
-// export const divisionPost = async (req: Request, res: Response) => {
-//   const name: string = (req.body.name as string).toUpperCase();
-//   const division = new Division({ name });
-
-//   await division.save()
-
-//   res.status(201).json({
-//     ok: true,
-//     msg: [],
-//     result: [division],
-//   });
-// };
-
-// export const divisionPut = async (req: Request, res: Response) => {
-//   const name: string = (req.body.name as string).toUpperCase();
-//   const { id } = req.params;
-
-//   const division = await Division.findByIdAndUpdate(id, {name}, {new: true});
-
-//   res.status(201).json({
-//     ok: true,
-//     msg: [],
-//     result: [division],
-//   });
-// };
-
-// export const divisionDelete = async (req: Request, res: Response) => {
-//     const { id } = req.params;
-
-//     const division = await Division.findByIdAndUpdate(id, {state: false}, {new: true});
-
-//     res.status(200).json({
-//       ok: true,
-//       msg: [],
-//       result: [division],
-//     });
-//   };

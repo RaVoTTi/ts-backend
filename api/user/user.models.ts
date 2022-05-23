@@ -7,6 +7,7 @@ export interface IUser extends Document {
     lastName: string
     email: string
     password: string
+    phone: number
     isAdmin: boolean
     state: boolean
     address?: IAddress
@@ -14,7 +15,6 @@ export interface IUser extends Document {
     dateCreated: Date
 
 
-    phone: number
 
     comparePassword(candidatePassword: string): boolean
 }
