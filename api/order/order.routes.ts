@@ -26,7 +26,7 @@ export const router = Router()
 
 // ROUTES
 
-// REGISTER
+// NORMAL USER
 router.get('/', [validateUserJwt], orderGetByJWT)
 router.post('/', [validateUserJwt], orderPostByJWT)
 router.patch('/:id', [validateUserJwt], orderPatchByJWT)
@@ -34,19 +34,19 @@ router.patch('/:id', [validateUserJwt], orderPatchByJWT)
 // ADMIN
 router.get(
     '/admin',
-    // [validateUserJwt, isAdminRole],
+    [validateUserJwt, isAdminRole],
     orderGet
 )
 router.get(
     '/admin/count',
-    //  [validateUserJwt, isAdminRole],
+     [validateUserJwt, isAdminRole],
     orderGetCount
 )
 router.get(
     '/admin/:id',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('id', "it isn't a valid id").isMongoId(),
         validateCamps,
     ],
@@ -55,8 +55,8 @@ router.get(
 router.post(
     '/admin/',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('book', 'The book is required').notEmpty(),
         check('state', 'The state is required').notEmpty(),
         check('price', 'The price is required').notEmpty(),
@@ -75,8 +75,8 @@ router.post(
 router.patch(
     '/admin/:id',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('id', "it isn't a valid id").isMongoId(),
 
         validateCamps,
@@ -94,8 +94,8 @@ router.patch(
 router.delete(
     '/admin/:id',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
 
         check('id', "it isn't a valid id").isMongoId(),
         validateCamps,

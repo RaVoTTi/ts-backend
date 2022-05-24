@@ -52,8 +52,8 @@ export const bookGetByIdAdmin = async (req: Request, res: Response) => {
     const { id: _id } = req.params
 
     const book = await Book.findOne({ $and: [{ _id }, { type: 'BOOK' }] })
-        .populate({ path: 'autor', select: 'name' })
-        .populate({ path: 'subject', select: 'name' })
+        // .populate({ path: 'autor', select: 'name' })
+        // .populate({ path: 'subject', select: 'name' })
 
     if (!book) return resIdError(res)
 

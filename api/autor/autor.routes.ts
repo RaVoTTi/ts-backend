@@ -25,20 +25,20 @@ export const router = Router()
 // ADMIN
 router.get(
     '/',
-    // [validateUserJwt, isAdminRole],
+    [validateUserJwt, isAdminRole],
     autorGet
 )
 router.get(
     '/count',
-    // [validateUserJwt, isAdminRole],
+    [validateUserJwt, isAdminRole],
     autorGetCount
 )
 
 router.get(
     '/:id',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('id', "it isn't a valid id").isMongoId(),
         validateCamps,
     ],
@@ -47,8 +47,8 @@ router.get(
 router.post(
     '',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('name', 'El name es obligatorio').notEmpty(),
         check('name').custom(validateAutor),
         check('state', 'El state es obligatorio').isBoolean(),
@@ -61,8 +61,8 @@ router.post(
 router.put(
     '/:id',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('id', "it isn't a valid id").isMongoId(),
         validateCamps,
         check('name', 'El name es obligatorio').notEmpty(),
@@ -76,8 +76,8 @@ router.put(
 router.delete(
     '/:id',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('id', "it isn't a valid id").isMongoId(),
         validateCamps,
     ],

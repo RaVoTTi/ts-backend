@@ -31,14 +31,14 @@ router.get('/', subjectGet)
 router.get(
     '/count',
     [
-        // validateUserJwt, isAdminRole
+        validateUserJwt, isAdminRole
     ],
     subjectGetCount
 )
 router.get(
     '/:id',
     [
-        // validateUserJwt, isAdminRole,
+        validateUserJwt, isAdminRole,
         check('id', "it isn't a valid id").isMongoId(),
         validateCamps,
     ],
@@ -47,8 +47,8 @@ router.get(
 router.post(
     '',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('name', 'The name is required').notEmpty(),
         check('icon', 'The name is required').notEmpty(),
 
@@ -61,8 +61,8 @@ router.post(
 router.put(
     '/:id',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('id', "it isn't a valid id").isMongoId(),
         validateCamps,
         check('name', 'The name is required').notEmpty(),
@@ -76,8 +76,8 @@ router.put(
 router.delete(
     '/:id',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('id', "it isn't a valid id").isMongoId(),
         validateCamps,
     ],

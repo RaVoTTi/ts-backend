@@ -52,14 +52,8 @@ export const orderGet = async (req: Request, res: Response) => {
 }
 
 export const orderGetCount = async (req: Request, res: Response) => {
-    const { state } = req.query
-    let query
-    if (state === 'both') {
-        query = {}
-    } else {
-        query = { state: true }
-    }
-    const orders = await Order.count(query)
+
+    const orders = await Order.count()
 
     res.status(200).json({
         ok: true,

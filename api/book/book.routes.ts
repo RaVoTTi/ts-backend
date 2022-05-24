@@ -35,15 +35,15 @@ router.get(
 
 // ADMIN
 router.get(
-    '/count',
-    // [validateUserJwt, isAdminRole],
+    '/admin/count',
+    //  [validateUserJwt, isAdminRole],
     bookGetCount
 )
 router.get(
-    '/:id',
+    '/admin/:id',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('id', "it isn't a valid id").isMongoId(),
 
         validateCamps,
@@ -53,9 +53,8 @@ router.get(
 router.post(
     '',
     [
-        // validateUserJwt,
-        // isAdminRole,
-        // uploadOptions.single('image'),
+        validateUserJwt,
+        isAdminRole,
 
         // validateCamps,
 
@@ -92,8 +91,8 @@ router.post(
 router.put(
     '/:id',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('id', "it isn't a valid id").isMongoId(),
 
         validateCamps,
@@ -118,8 +117,8 @@ router.put(
 router.delete(
     '/:id',
     [
-        // validateUserJwt,
-        // isAdminRole,
+        validateUserJwt,
+        isAdminRole,
         check('id', "it isn't a valid id").isMongoId(),
         validateCamps,
     ],
