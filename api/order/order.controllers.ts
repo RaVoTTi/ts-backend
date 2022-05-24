@@ -51,6 +51,27 @@ export const orderGet = async (req: Request, res: Response) => {
     })
 }
 
+export const orderGetIncome = async (req: Request, res: Response) => {
+    const totalIncome = await Order.aggregate([
+        {
+            $group:{_id: null , totalIncome: {$sum: '$price'}}
+        }
+    ])
+
+    if (!totalIncome[0].totalIncome) {
+        res.status(400).json({
+            ok: true,
+            msg: ['The order Income cannot be generated'],
+        })
+    }   
+    console.log()
+    
+    res.status(200).json({
+        ok: true,
+        msg: [],
+        result: totalIncome[0].totalIncome,
+    })
+}
 export const orderGetCount = async (req: Request, res: Response) => {
 
     const orders = await Order.count()

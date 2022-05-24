@@ -17,6 +17,7 @@ import {
     orderPost,
     orderPostByJWT,
     orderPatch,
+    orderGetIncome,
 } from './order.controllers'
 import { validateUserJwt } from '../../middlewares/validate-user-JWT'
 import { isAdminRole } from '../../middlewares/validate-admin-role'
@@ -42,6 +43,7 @@ router.get(
      [validateUserJwt, isAdminRole],
     orderGetCount
 )
+router.get('/admin/income', [validateUserJwt, isAdminRole], orderGetIncome)
 router.get(
     '/admin/:id',
     [
