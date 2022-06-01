@@ -35,7 +35,7 @@ export const bookGetById = async (req: Request, res: Response) => {
     const { id: _id } = req.params
 
     const book = await Book.findOne({
-        $and: [{ _id }, { state: true }, { type: 'BOOK' }],
+        $and: [{ _id }, { state: true }],
     })
 
     if (!book) return resIdError(res)
@@ -51,7 +51,7 @@ export const bookGetById = async (req: Request, res: Response) => {
 export const bookGetByIdAdmin = async (req: Request, res: Response) => {
     const { id: _id } = req.params
 
-    const book = await Book.findOne({ $and: [{ _id }, { type: 'BOOK' }] })
+    const book = await Book.findOne({ _id } )
         // .populate({ path: 'autor', select: 'name' })
         // .populate({ path: 'subject', select: 'name' })
 
