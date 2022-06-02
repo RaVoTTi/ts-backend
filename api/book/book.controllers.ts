@@ -37,6 +37,8 @@ export const bookGetById = async (req: Request, res: Response) => {
     const book = await Book.findOne({
         $and: [{ _id }, { state: true }],
     })
+        .populate({ path: 'autor', select: 'name' })
+        .populate({ path: 'subject', select: ['name'] })
 
     if (!book) return resIdError(res)
 
@@ -51,9 +53,9 @@ export const bookGetById = async (req: Request, res: Response) => {
 export const bookGetByIdAdmin = async (req: Request, res: Response) => {
     const { id: _id } = req.params
 
-    const book = await Book.findOne({ _id } )
-        // .populate({ path: 'autor', select: 'name' })
-        // .populate({ path: 'subject', select: 'name' })
+    const book = await Book.findOne({ _id })
+    // .populate({ path: 'autor', select: 'name' })
+    // .populate({ path: 'subject', select: 'name' })
 
     if (!book) return resIdError(res)
 
@@ -117,7 +119,6 @@ export const bookPut = async (req: Request, res: Response) => {
         Subject.findOne({ $and: [{ _id: subject }, { state: true }] }),
         Book.findOne({ name }),
         Book.findOne({ _id }),
-
     ])
 
     if (!autorExist || !subjectExist || !idExist) return resIdError(res)
@@ -147,13 +148,14 @@ export const bookPut = async (req: Request, res: Response) => {
     const book = await Book.findOneAndUpdate(
         { _id },
         { autor, subject, image, ...rest },
-        {new: true}
+        { new: true }
     )
     if (!book) return resIdError(res)
 
-
-
-    if (idExist.image != book.image && idExist.image !== '/public/uploads/default.jpeg') {
+    if (
+        idExist.image != book.image &&
+        idExist.image !== '/public/uploads/default.jpeg'
+    ) {
         const pathImage = process.env.PWD + idExist.image
         if (fs.existsSync(pathImage)) {
             fs.unlinkSync(pathImage)
