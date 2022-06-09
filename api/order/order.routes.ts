@@ -11,13 +11,14 @@ import {
     orderDelete,
     orderGet,
     orderGetById,
-    orderGetByJWT,
     orderGetCount,
     orderPatchByJWT,
     orderPost,
     orderPostByJWT,
     orderPatch,
     orderGetIncome,
+    myOrderGetById,
+    myOrderGet,
 } from './order.controllers'
 import { validateUserJwt } from '../../middlewares/validate-user-JWT'
 import { isAdminRole } from '../../middlewares/validate-admin-role'
@@ -28,21 +29,30 @@ export const router = Router()
 // ROUTES
 
 // NORMAL USER
-router.get('/', [validateUserJwt], orderGetByJWT)
-router.post('/', [validateUserJwt], orderPostByJWT)
-router.patch('/:id', [validateUserJwt], orderPatchByJWT)
+router.get('/user', [validateUserJwt], myOrderGet)
+router.get(
+    '/user/:id',
+    [
+        validateUserJwt,
+        check('id', "it isn't a valid id").isMongoId(),
+        validateCamps,
+    ],
+    myOrderGetById
+)
+router.post('/user', [validateUserJwt], orderPostByJWT)
+router.patch(
+    '/user/:id',
+    [
+        validateUserJwt,
+        check('id', "it isn't a valid id").isMongoId(),
+        validateCamps,
+    ],
+    orderPatchByJWT
+)
 
 // ADMIN
-router.get(
-    '/admin',
-    [validateUserJwt, isAdminRole],
-    orderGet
-)
-router.get(
-    '/admin/count',
-     [validateUserJwt, isAdminRole],
-    orderGetCount
-)
+router.get('/admin', [validateUserJwt, isAdminRole], orderGet)
+router.get('/admin/count', [validateUserJwt, isAdminRole], orderGetCount)
 router.get('/admin/income', [validateUserJwt, isAdminRole], orderGetIncome)
 router.get(
     '/admin/:id',

@@ -5,11 +5,29 @@ import { Order } from './order.models'
 import { Book } from '../book/book.models'
 
 // REGISTER
-export const orderGetByJWT = async (req: Request, res: Response) => {
+export const myOrderGet = async (req: Request, res: Response) => {
+    const { user } = req
+    const { condition } = req.query
+
+
+    const orders = await Order.find({
+        $and: [{ user: user._id }, { state: true }, {condition}],
+    })
+
+    if (!orders) return resIdError(res)
+
+    res.status(200).json({
+        ok: true,
+        msg: [],
+        result: orders,
+    })
+}
+export const myOrderGetById = async (req: Request, res: Response) => {
+    const { id } = req.params
     const { user } = req
 
     const orders = await Order.find({
-        $and: [{ _id: user._id }, { state: true }],
+        $and: [{ _id: id }, { user: user._id }, { state: true }, {condition: 1}],
     })
 
     if (!orders) return resIdError(res)
