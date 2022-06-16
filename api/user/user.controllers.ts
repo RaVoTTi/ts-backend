@@ -58,27 +58,27 @@ export const userAddressPutByJWT = async (req: Request, res: Response) => {
         msg: ['User modificated succesful'],
     })
 }
-export const userCryptoAddressPutByJWT = async (
-    req: Request,
-    res: Response
-) => {
-    const { user } = req
+// export const userCryptoAddressPutByJWT = async (
+//     req: Request,
+//     res: Response
+// ) => {
+//     const { user } = req
 
-    const { cryptoType, wallet } = req.body
+//     const { cryptoType, wallet } = req.body
 
-    const cryptoAddress = { cryptoType, wallet }
+//     const cryptoAddress = { cryptoType, wallet }
 
-    const newUser = await User.findOneAndUpdate(
-        { $and: [{ _id: user._id }, { state: true }] },
-        { cryptoAddress }
-    )
-    if (!newUser) return resIdError(res)
+//     const newUser = await User.findOneAndUpdate(
+//         { $and: [{ _id: user._id }, { state: true }] },
+//         { cryptoAddress }
+//     )
+//     if (!newUser) return resIdError(res)
 
-    res.status(201).json({
-        ok: true,
-        msg: ['User modificated succesful'],
-    })
-}
+//     res.status(201).json({
+//         ok: true,
+//         msg: ['User modificated succesful'],
+//     })
+// }
 
 // export const userDeleteByJWT = async (req: Request, res: Response) => {
 //     const { user } = req

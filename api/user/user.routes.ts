@@ -12,13 +12,13 @@ import { validateUserJwt } from '../../middlewares/validate-user-JWT'
 // ROUTES
 import {
     userAddressPutByJWT,
-    userCryptoAddressPutByJWT,
+    // userCryptoAddressPutByJWT,
     userGetByJWT,
     userPhonePutByJWT,
 
 } from './user.controllers'
 
-// PATH /api/user
+// PATH /user
 export const router = Router()
 
 // ROUTES
@@ -48,14 +48,14 @@ router.put(
     ],
     userAddressPutByJWT
 )
-router.put(
-    '/cryptoaddress/',
-    [
-        validateUserJwt,
-        check('cryptoType', 'The cryptoType is required').isString(),
-        check('wallet', 'The wallet is required').isString(),
-        validateCamps,
-    ],
-    userCryptoAddressPutByJWT
-)
+// router.put(
+//     '/cryptoaddress/',
+//     [
+//         validateUserJwt,
+//         check('cryptoType', 'The cryptoType is required').isString(),
+//         check('wallet', 'The wallet is required').isString(),
+//         validateCamps,
+//     ],
+//     userCryptoAddressPutByJWT
+// )
 

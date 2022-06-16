@@ -11,7 +11,7 @@ export interface IUser extends Document {
     isAdmin: boolean
     state: boolean
     address?: IAddress
-    cryptoAddress?: ICryptoAddress
+    // cryptoAddress?: ICryptoAddress
     dateCreated: Date
 
 
@@ -25,10 +25,10 @@ export interface IAddress extends Document {
     zip: string
     country: string
 }
-export interface ICryptoAddress extends Document {
-    cryptoType: string
-    wallet: string
-}
+// export interface ICryptoAddress extends Document {
+//     cryptoType: string
+//     wallet: string
+// }
 
 const addressSchema: Schema<IAddress> = new Schema(
     {
@@ -50,18 +50,18 @@ const addressSchema: Schema<IAddress> = new Schema(
     },
     { _id: false }
 )
-const cryptoAddressSchema: Schema<ICryptoAddress> = new Schema(
-    {
-        cryptoType: {
-            type: String,
-        },
-        wallet: {
-            type: String,
-        },
+// const cryptoAddressSchema: Schema<ICryptoAddress> = new Schema(
+//     {
+//         cryptoType: {
+//             type: String,
+//         },
+//         wallet: {
+//             type: String,
+//         },
 
-    },
-    { _id: false }
-)
+//     },
+//     { _id: false }
+// )
 
 
 const userSchema: Schema<IUser> = new Schema({
@@ -88,10 +88,10 @@ const userSchema: Schema<IUser> = new Schema({
     address: {
         type: addressSchema,
     },
-    cryptoAddress: {
-        type: cryptoAddressSchema,
+    // cryptoAddress: {
+    //     type: cryptoAddressSchema,
 
-    },
+    // },
     phone: {
         type: Number,
         required: [true, 'zip is required'],

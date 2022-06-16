@@ -8,17 +8,16 @@ import { validateCamps } from '../../middlewares/validate-camps'
 
 // CONTROLLERS
 import {
+    myOrderGet,
+    myOrderGetById,
+    myOrderPost,
     orderDelete,
     orderGet,
     orderGetById,
     orderGetCount,
-    orderPatchByJWT,
-    orderPost,
-    orderPostByJWT,
-    orderPatch,
     orderGetIncome,
-    myOrderGetById,
-    myOrderGet,
+    orderPost,
+    orderPatch,
 } from './order.controllers'
 import { validateUserJwt } from '../../middlewares/validate-user-JWT'
 import { isAdminRole } from '../../middlewares/validate-admin-role'
@@ -29,7 +28,11 @@ export const router = Router()
 // ROUTES
 
 // NORMAL USER
-router.get('/user', [validateUserJwt], myOrderGet)
+router.get(
+    '/user',
+    [validateUserJwt],
+    myOrderGet
+)
 router.get(
     '/user/:id',
     [
@@ -39,15 +42,19 @@ router.get(
     ],
     myOrderGetById
 )
-router.post('/user', [validateUserJwt], orderPostByJWT)
-router.patch(
-    '/user/:id',
+router.post(
+    '/checkout/:id',
     [
         validateUserJwt,
         check('id', "it isn't a valid id").isMongoId(),
+        check('addressLTC', "it isn't a valid LTC address").notEmpty(),
+        check('price', "it isn't a valid price").notEmpty(),
+        validateCamps,
+        check('addressLTC', "it isn't a valid LTC addressssss").isString(),
+        check('price', "it isn't a valid price").isNumeric(),
         validateCamps,
     ],
-    orderPatchByJWT
+    myOrderPost
 )
 
 // ADMIN

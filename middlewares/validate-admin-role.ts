@@ -13,7 +13,7 @@ export const isAdminRole = (
             result: [],
         })
     }
-    if (user.state !== true) {
+    if (user.isAdmin !== true) {
         return res.status(401).json({
             ok: false,
             msg: ["You don't have access"],

@@ -43,7 +43,7 @@ export const loginPost = async (req: Request, res: Response) => {
   }
 };
 
-export const registerPost = async (req: Request, res: Response) => {
+export const signUpPost = async (req: Request, res: Response) => {
   const {
       password: noHashPassword,
 
@@ -58,6 +58,7 @@ export const registerPost = async (req: Request, res: Response) => {
   const user = new User({
       ...rest,
       password,
+      
   })
 
   await user.save()

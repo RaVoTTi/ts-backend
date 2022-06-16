@@ -7,6 +7,7 @@ export interface IOrder extends Document {
     price: Number
     condition: number
     dateCreated: Date
+    addressLTC:string
 }
 
 const orderSchema: Schema<IOrder> = new Schema({
@@ -17,7 +18,7 @@ const orderSchema: Schema<IOrder> = new Schema({
     },
     state: {
         type: Boolean,
-        required: true,
+        default: true
     },
     price: {
         type: Number,
@@ -32,6 +33,10 @@ const orderSchema: Schema<IOrder> = new Schema({
         ref: 'User',
         required: true,
     },
+    addressLTC: {
+        type: String,
+        required: true,
+    },
     dateCreated: {
         type: Date,
         default: Date.now,
@@ -42,5 +47,7 @@ orderSchema.methods.toJSON = function () {
 
     return resto
 }
+
+
 
 export const Order = model<IOrder>('Order', orderSchema)

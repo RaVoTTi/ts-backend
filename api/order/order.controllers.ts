@@ -8,11 +8,28 @@ import { Book } from '../book/book.models'
 export const myOrderGet = async (req: Request, res: Response) => {
     const { user } = req
     const { condition } = req.query
+    let orders
+    if (condition === '1') {
+        orders = await Order.find({
+            $and: [{ user: user._id }, { state: true }, { condition }],
+        })
+            .populate({ path: 'book', select: 'name image description' })
+            .select('-dateCreated')
+    } else if (condition === '0') {
+        orders = await Order.find({
+            $and: [{ user: user._id }, { state: true }],
+        })
+        .populate({ path: 'book', select: 'name image' })
+    } else {
+        return res.status(400).json({
+            ok: false,
+            msg: ['Server Error'],
+        })
+    }
 
-
-    const orders = await Order.find({
-        $and: [{ user: user._id }, { state: true }, {condition}],
-    })
+    // const orders = await Order.find({
+    //     $and: [{ user: user._id }, { state: true }, {condition}],
+    // })
 
     if (!orders) return resIdError(res)
 
@@ -26,32 +43,63 @@ export const myOrderGetById = async (req: Request, res: Response) => {
     const { id } = req.params
     const { user } = req
 
-    const orders = await Order.find({
-        $and: [{ _id: id }, { user: user._id }, { state: true }, {condition: 1}],
+    const order = await Order.findOne({
+        $and: [
+            { _id: id },
+            { user: user._id },
+            { state: true },
+            { condition: 1 },
+        ],
     })
+    .populate({ path: 'book', select: 'name content' })
 
-    if (!orders) return resIdError(res)
+
+    if (!order) return resIdError(res)
 
     res.status(200).json({
         ok: true,
         msg: [],
-        result: orders,
+        result: order,
     })
 }
-export const orderPostByJWT = async (req: Request, res: Response) => {
+export const myOrderPost = async (req: Request, res: Response) => {
     const { user } = req
-    const { orderItems, ...rest } = req.body
-}
-export const orderPatchByJWT = async (req: Request, res: Response) => {
-    const { user } = req
-    console.log(user._id)
-    const { orderItems, ...rest } = req.body
+    const { id } = req.params
+    const { price, addressLTC } = req.body
+
+    const bookExist = await Book.findOne({
+        $and: [{ id }, { state: true }],
+    })
+
+    if (!bookExist) return resIdError(res)
+
+    if (price > bookExist.maxPrice || price < bookExist.minPrice) {
+        return res.status(400).json({
+            ok: false,
+            msg: ['The price is invalid'],
+        })
+    }
+
+    const order = new Order({
+        book: id,
+        price,
+        user,
+        addressLTC,
+        condition: 1,
+    })
+
+    await order.save()
+    res.status(201).json({
+        ok: true,
+        msg: ['The order was purchased'],
+    })
 }
 
 // ADMIN
 
 export const orderGet = async (req: Request, res: Response) => {
     const { state } = req.query
+
     let query
     if (state === 'both') {
         query = {}
@@ -72,8 +120,8 @@ export const orderGet = async (req: Request, res: Response) => {
 export const orderGetIncome = async (req: Request, res: Response) => {
     const totalIncome = await Order.aggregate([
         {
-            $group:{_id: null , totalIncome: {$sum: '$price'}}
-        }
+            $group: { _id: null, totalIncome: { $sum: '$price' } },
+        },
     ])
 
     if (!totalIncome[0].totalIncome) {
@@ -81,9 +129,9 @@ export const orderGetIncome = async (req: Request, res: Response) => {
             ok: true,
             msg: ['The order Income cannot be generated'],
         })
-    }   
+    }
     console.log()
-    
+
     res.status(200).json({
         ok: true,
         msg: [],
@@ -91,7 +139,6 @@ export const orderGetIncome = async (req: Request, res: Response) => {
     })
 }
 export const orderGetCount = async (req: Request, res: Response) => {
-
     const orders = await Order.count()
 
     res.status(200).json({
@@ -164,7 +211,6 @@ export const orderPatch = async (req: Request, res: Response) => {
         { new: true }
     )
     if (!order) return resIdError(res)
-
 
     res.status(201).json({
         ok: true,

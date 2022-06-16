@@ -1,4 +1,4 @@
-import { loginPost, registerPost } from './auth.controllers'
+import { loginPost, signUpPost } from './auth.controllers'
 import { Router } from 'express'
 import { validateEmail } from '../user/user.validators'
 import { validateCamps } from '../../middlewares/validate-camps'
@@ -24,11 +24,10 @@ router.post(
     loginPost
 )
 router.post(
-    '/register',
+    '/signup',
     [
         check('name', 'Name is required').notEmpty(),
         check('lastName', 'lastName is required').notEmpty(),
-
         check('email', 'Email is required').notEmpty(),
         check('password', 'Password is required').notEmpty(),
         check('phone', 'The phone is required').notEmpty(),
@@ -45,5 +44,5 @@ router.post(
         validateCamps,
         clearCamps(['isAdmin', 'state']),
     ],
-    registerPost
+    signUpPost
 )

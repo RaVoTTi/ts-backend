@@ -3,7 +3,6 @@ import { model, Schema, Document } from 'mongoose'
 export interface IBook extends Document {
     name: string
     description: string
-    richDescription: string
     state: boolean
     isFeatured: boolean
     image: string
@@ -26,10 +25,6 @@ const bookSchema: Schema<IBook> = new Schema({
         required: [true, 'The book is required'],
     },
     description: {
-        type: String,
-        required: [true, 'The description is required'],
-    },
-    richDescription: {
         type: String,
         required: [true, 'The description is required'],
     },
@@ -82,6 +77,8 @@ const bookSchema: Schema<IBook> = new Schema({
     },
     content: {
         type: String,
+        required: [true, 'The content is required'],
+
     },
 })
 
