@@ -67,6 +67,8 @@ router.post(
         check('maxPrice', 'The price is required').notEmpty(),
         check('state', 'The state is required').notEmpty(),
         check('isFeatured', 'The isFeatured is required').notEmpty(),
+        check('evaluation', 'The Evaluation is required').notEmpty(),
+
         // check('content', 'The content is required').isString(),
         validateCamps,
         check('name', 'The name is required').isString(),
@@ -78,6 +80,7 @@ router.post(
         check('maxPrice', 'The price is required').isNumeric(),
         check('state', 'The state is required').isBoolean(),
         check('isFeatured', 'The isFeatured is required').isBoolean(),
+
         // check('content', 'The content is required').isString(),
         validateCamps,
         check('name').custom(validateBook),

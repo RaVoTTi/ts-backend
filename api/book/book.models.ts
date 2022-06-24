@@ -1,5 +1,16 @@
 import { model, Schema, Document } from 'mongoose'
 
+export interface IOption {
+    option: string
+    key: string
+}
+
+export interface IEvaluation {
+    question: string
+    correctKey: string
+    options?: IOption[]
+}
+
 export interface IBook extends Document {
     name: string
     description: string
@@ -13,9 +24,35 @@ export interface IBook extends Document {
     dateCreated: Date
     numReviews: number
     autor: string
-    evaluation?: string
-    content?: string
+    evaluation: IEvaluation[]
+    content: string
 }
+
+
+
+const evaluationSchema: Schema<IEvaluation> = new Schema(
+    {
+        question: {
+            type: String,
+            required: [true, 'The question is required'],
+        },
+        correctKey: {
+            type: String,
+            required: [true, 'The correctKey is required'],
+        },
+        options:{
+            type: [{
+            option: {
+                type: String,
+            },
+            key: {
+                type: String,
+            },
+        }]}
+    },
+    {_id:false}
+)
+
 
 const bookSchema: Schema<IBook> = new Schema({
     name: {
@@ -71,14 +108,10 @@ const bookSchema: Schema<IBook> = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Autor',
     },
-    evaluation: {
-        type: String,
-        // required: [true, 'The evaluation is required'],
-    },
+    evaluation: evaluationSchema,
     content: {
         type: String,
         required: [true, 'The content is required'],
-
     },
 })
 
@@ -89,3 +122,5 @@ bookSchema.methods.toJSON = function () {
 }
 
 export const Book = model<IBook>('Book', bookSchema)
+export const Evaluation = model<IEvaluation>('Evaluation', evaluationSchema)
+

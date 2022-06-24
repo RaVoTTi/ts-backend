@@ -1,9 +1,12 @@
-import { loginPost, signUpPost } from './auth.controllers'
+import { loginPost, signUpPost, verifyGet } from './auth.controllers'
 import { Router } from 'express'
 import { validateEmail } from '../user/user.validators'
 import { validateCamps } from '../../middlewares/validate-camps'
 import { check } from 'express-validator'
 import { clearCamps } from '../../middlewares/clear-camps'
+import { validateUserJwt } from '../../middlewares/validate-user-JWT'
+import { verify } from 'jsonwebtoken'
+import { isAdminRole } from '../../middlewares/validate-admin-role'
 
 // PATH /api/auth/
 export const router = Router()
@@ -12,8 +15,8 @@ export const router = Router()
 router.post(
     '/login',
     [
-        check('email', 'Name is required').notEmpty(),
-        check('password', 'lastName is required').notEmpty(),
+        check('email', 'Email is required').notEmpty(),
+        check('password', 'Password is required').notEmpty(),
         validateCamps,
         check('email', 'Email is required').isEmail(),
         check('password', 'Password need to be more than 6 char').isLength({
@@ -23,6 +26,9 @@ router.post(
     ],
     loginPost
 )
+router.get('/verify', [validateUserJwt], verifyGet)
+router.get('/verify/admin', [validateUserJwt, isAdminRole], verifyGet)
+
 router.post(
     '/signup',
     [

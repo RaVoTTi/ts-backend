@@ -14,7 +14,7 @@ export const myOrderGet = async (req: Request, res: Response) => {
             $and: [{ user: user._id }, { state: true }, { condition }],
         })
             .populate({ path: 'book', select: 'name image description' })
-            .select('-dateCreated')
+            .select('-dateCreated -addressLTC')
     } else if (condition === '0') {
         orders = await Order.find({
             $and: [{ user: user._id }, { state: true }],
@@ -26,10 +26,6 @@ export const myOrderGet = async (req: Request, res: Response) => {
             msg: ['Server Error'],
         })
     }
-
-    // const orders = await Order.find({
-    //     $and: [{ user: user._id }, { state: true }, {condition}],
-    // })
 
     if (!orders) return resIdError(res)
 
@@ -92,6 +88,52 @@ export const myOrderPost = async (req: Request, res: Response) => {
     res.status(201).json({
         ok: true,
         msg: ['The order was purchased'],
+    })
+}
+export const myEvaluationGetById = async (req: Request, res: Response) => {
+    const { id } = req.params
+    const { user } = req
+
+    const order = await Order.findOne({
+        $and: [
+            { _id: id },
+            { user: user._id },
+            { state: true },
+            { condition: 1 },
+        ],
+    })
+    .populate({ path: 'book', select: 'name evaluation' })
+
+
+    if (!order) return resIdError(res)
+
+    res.status(200).json({
+        ok: true,
+        msg: [],
+        result: order,
+    })
+}
+export const myEvaluationPatch = async (req: Request, res: Response) => {
+    const { id } = req.params
+    const { user } = req
+
+    const order = await Order.findOne({
+        $and: [
+            { _id: id },
+            { user: user._id },
+            { state: true },
+            { condition: 1 },
+        ],
+    })
+    .populate({ path: 'book', select: 'name content' })
+
+
+    if (!order) return resIdError(res)
+
+    res.status(200).json({
+        ok: true,
+        msg: [],
+        result: order,
     })
 }
 

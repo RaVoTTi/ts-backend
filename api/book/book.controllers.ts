@@ -2,7 +2,7 @@ import { Response, Request, NextFunction } from 'express'
 import fs from 'fs'
 
 import resIdError from '../../utils/res-idError'
-import { Book } from '../book/book.models'
+import { Book, Evaluation, IEvaluation } from '../book/book.models'
 import Autor from '../autor/autor.models'
 import Subject from '../subject/subject.models'
 import { saveFile } from '../../helpers/save-file'
@@ -76,8 +76,14 @@ export const bookGetCount = async (req: Request, res: Response) => {
 }
 
 export const bookPost = async (req: Request, res: Response) => {
-    const { autor, content, subject, image: fakeImage, ...rest } = req.body
-
+    const {
+        autor,
+        content,
+        subject,
+        image: fakeImage,
+        evaluation: oldEvaluation,
+        ...rest
+    } = req.body
     const [autorExist, subjectExist] = await Promise.all([
         Autor.findOne({ $and: [{ _id: autor }, { state: true }] }),
         Subject.findOne({ $and: [{ _id: subject }, { state: true }] }),
@@ -85,6 +91,15 @@ export const bookPost = async (req: Request, res: Response) => {
 
     if (!autorExist || !subjectExist) return resIdError(res)
     const relativePath = `/public/uploads/`
+
+    const evaluationParsed = JSON.parse(oldEvaluation) as IEvaluation[]
+
+    const evaluation = await evaluationParsed.map( async({question, correctKey, options}, index) => {
+        return new Evaluation({
+            question,
+            correctKey,
+        })
+    })
 
     let image: unknown
     if (!req.files || Object.keys(req.files).length === 0 || !req.files.image) {
@@ -100,7 +115,14 @@ export const bookPost = async (req: Request, res: Response) => {
         }
     }
 
-    const book = new Book({ autor, content, subject, image, ...rest })
+    const book = new Book({
+        autor,
+        content,
+        subject,
+        image,
+        // evaluation,
+        ...rest,
+    })
 
     await book.save()
 

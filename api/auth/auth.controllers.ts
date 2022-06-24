@@ -42,6 +42,14 @@ export const loginPost = async (req: Request, res: Response) => {
     });
   }
 };
+export const verifyGet = async (req: Request, res: Response) => {
+
+  res.status(200).json({
+      ok: true,
+      msg: ['Token is valid'],
+  })
+}
+
 
 export const signUpPost = async (req: Request, res: Response) => {
   const {
