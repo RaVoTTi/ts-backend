@@ -18,6 +18,7 @@ import {
     orderGetIncome,
     orderPost,
     orderPatch,
+    myEvaluationPatch,
 } from './order.controllers'
 import { validateUserJwt } from '../../middlewares/validate-user-JWT'
 import { isAdminRole } from '../../middlewares/validate-admin-role'
@@ -41,6 +42,25 @@ router.get(
         validateCamps,
     ],
     myOrderGetById
+)
+router.patch(
+    '/evaluation/:id',
+    [
+        validateUserJwt,
+        check('id', "it isn't a valid id").isMongoId(),
+        check('result',"it isn't a valid id").notEmpty(),
+        check('result',"it isn't a valid id").isString(),
+
+        validateCamps,
+        // check('result').custom(result =>{
+        //     if(result != 'zi4jba#cxlkNMzI' ){
+        //         return Promise.reject('The evaluation is Wrong');
+        //     }
+        // }),
+        // validateCamps,
+
+    ],
+    myEvaluationPatch
 )
 router.post(
     '/checkout/:id',

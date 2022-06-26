@@ -28,32 +28,6 @@ export interface IBook extends Document {
     content: string
 }
 
-
-
-const evaluationSchema: Schema<IEvaluation> = new Schema(
-    {
-        question: {
-            type: String,
-            required: [true, 'The question is required'],
-        },
-        correctKey: {
-            type: String,
-            required: [true, 'The correctKey is required'],
-        },
-        options:{
-            type: [{
-            option: {
-                type: String,
-            },
-            key: {
-                type: String,
-            },
-        }]}
-    },
-    {_id:false}
-)
-
-
 const bookSchema: Schema<IBook> = new Schema({
     name: {
         type: String,
@@ -108,7 +82,44 @@ const bookSchema: Schema<IBook> = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Autor',
     },
-    evaluation: evaluationSchema,
+    evaluation: {
+        type: [
+            {
+                question: {
+                    type: String,
+                    required: [true, 'The question is required'],
+                },
+                correctKey: {
+                    lowercase: true,
+                    type: String,
+                    required: [true, 'The correctKey is required'],
+                },
+                options: {
+                    type: [
+                        {
+                            option: {
+                                type: String,
+                                required: [true, 'The option is required'],
+                            },
+                            key: {
+                                lowercase: true,
+                                type: String,
+                                required: [true, 'The key is required'],
+                            },
+                        },
+                        {
+                            _id: false,
+                        },
+                    ],
+                    _id: false,
+                },
+            },
+            {
+                _id: false,
+            },
+        ],
+        _id: false,
+    },
     content: {
         type: String,
         required: [true, 'The content is required'],
@@ -122,5 +133,3 @@ bookSchema.methods.toJSON = function () {
 }
 
 export const Book = model<IBook>('Book', bookSchema)
-export const Evaluation = model<IEvaluation>('Evaluation', evaluationSchema)
-

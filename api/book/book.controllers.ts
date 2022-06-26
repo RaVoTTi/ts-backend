@@ -2,7 +2,7 @@ import { Response, Request, NextFunction } from 'express'
 import fs from 'fs'
 
 import resIdError from '../../utils/res-idError'
-import { Book, Evaluation, IEvaluation } from '../book/book.models'
+import { Book, IEvaluation } from '../book/book.models'
 import Autor from '../autor/autor.models'
 import Subject from '../subject/subject.models'
 import { saveFile } from '../../helpers/save-file'
@@ -54,11 +54,11 @@ export const bookGetByIdAdmin = async (req: Request, res: Response) => {
     const { id: _id } = req.params
 
     const book = await Book.findOne({ _id })
-    // .populate({ path: 'autor', select: 'name' })
-    // .populate({ path: 'subject', select: 'name' })
+    .populate({ path: 'autor', select: 'name' })
+    .populate({ path: 'subject', select: 'name' })
 
     if (!book) return resIdError(res)
-
+2
     return res.status(200).json({
         ok: true,
         msg: [],
@@ -92,14 +92,7 @@ export const bookPost = async (req: Request, res: Response) => {
     if (!autorExist || !subjectExist) return resIdError(res)
     const relativePath = `/public/uploads/`
 
-    const evaluationParsed = JSON.parse(oldEvaluation) as IEvaluation[]
-
-    const evaluation = await evaluationParsed.map( async({question, correctKey, options}, index) => {
-        return new Evaluation({
-            question,
-            correctKey,
-        })
-    })
+    const evaluation = JSON.parse(oldEvaluation) as IEvaluation[]
 
     let image: unknown
     if (!req.files || Object.keys(req.files).length === 0 || !req.files.image) {
@@ -120,11 +113,12 @@ export const bookPost = async (req: Request, res: Response) => {
         content,
         subject,
         image,
-        // evaluation,
+        evaluation: [...evaluation],
         ...rest,
     })
 
     await book.save()
+
 
     res.status(201).json({
         ok: true,
@@ -134,7 +128,10 @@ export const bookPost = async (req: Request, res: Response) => {
 
 export const bookPut = async (req: Request, res: Response) => {
     const { id: _id } = req.params
-    const { name, autor, subject, image: fakeImage, ...rest } = req.body
+    const { name, autor, subject, 
+        evaluation: oldEvaluation,
+        
+        image: fakeImage, ...rest } = req.body
 
     const [autorExist, subjectExist, nameExist, idExist] = await Promise.all([
         Autor.findOne({ $and: [{ _id: autor }, { state: true }] }),
@@ -142,6 +139,8 @@ export const bookPut = async (req: Request, res: Response) => {
         Book.findOne({ name }),
         Book.findOne({ _id }),
     ])
+    const evaluation = JSON.parse(oldEvaluation) as IEvaluation[]
+
 
     if (!autorExist || !subjectExist || !idExist) return resIdError(res)
 
@@ -169,7 +168,7 @@ export const bookPut = async (req: Request, res: Response) => {
 
     const book = await Book.findOneAndUpdate(
         { _id },
-        { autor, subject, image, ...rest },
+        { autor, subject, image, evaluation:[...evaluation], ...rest },
         { new: true }
     )
     if (!book) return resIdError(res)

@@ -18,8 +18,7 @@ export const myOrderGet = async (req: Request, res: Response) => {
     } else if (condition === '0') {
         orders = await Order.find({
             $and: [{ user: user._id }, { state: true }],
-        })
-        .populate({ path: 'book', select: 'name image' })
+        }).populate({ path: 'book', select: 'name image' })
     } else {
         return res.status(400).json({
             ok: false,
@@ -46,9 +45,7 @@ export const myOrderGetById = async (req: Request, res: Response) => {
             { state: true },
             { condition: 1 },
         ],
-    })
-    .populate({ path: 'book', select: 'name content' })
-
+    }).populate({ path: 'book', select: 'name content evaluation' })
 
     if (!order) return resIdError(res)
 
@@ -101,9 +98,7 @@ export const myEvaluationGetById = async (req: Request, res: Response) => {
             { state: true },
             { condition: 1 },
         ],
-    })
-    .populate({ path: 'book', select: 'name evaluation' })
-
+    }).populate({ path: 'book', select: 'name evaluation' })
 
     if (!order) return resIdError(res)
 
@@ -117,16 +112,20 @@ export const myEvaluationPatch = async (req: Request, res: Response) => {
     const { id } = req.params
     const { user } = req
 
-    const order = await Order.findOne({
-        $and: [
-            { _id: id },
-            { user: user._id },
-            { state: true },
-            { condition: 1 },
-        ],
-    })
-    .populate({ path: 'book', select: 'name content' })
-
+    const order = await Order.findOneAndUpdate(
+        {
+            $and: [
+                { _id: id },
+                { user: user._id },
+                { state: true },
+                { condition: 1 },
+            ],
+        },
+        {
+            condition: 2,
+        },
+        { new: true }
+    )
 
     if (!order) return resIdError(res)
 
