@@ -3,6 +3,11 @@ import resIdError from '../../utils/res-idError'
 import { User } from '../user/user.models'
 import { Order } from './order.models'
 import { Book } from '../book/book.models'
+import {
+    generatePaymentIntent,
+    generatePaymentMethod,
+    getPaymentDetail,
+} from '../../helpers/stripe'
 
 // REGISTER
 export const myOrderGet = async (req: Request, res: Response) => {
@@ -11,14 +16,17 @@ export const myOrderGet = async (req: Request, res: Response) => {
     let orders
     if (condition === '1') {
         orders = await Order.find({
-            $and: [{ user: user._id }, { state: true }, { condition }],
+            $and: [{ user: user._id }, { condition: 1 }],
         })
             .populate({ path: 'book', select: 'name image description' })
-            .select('-dateCreated -addressLTC')
+            .select('-dateCreated -addressLTC -user')
     } else if (condition === '0') {
-        orders = await Order.find({
-            $and: [{ user: user._id }, { state: true }],
-        }).populate({ path: 'book', select: 'name image' })
+        orders = await Order.find({ user: user._id })
+            .populate({
+                path: 'book',
+                select: 'name image',
+            })
+            .select('-stripeId -user')
     } else {
         return res.status(400).json({
             ok: false,
@@ -34,7 +42,7 @@ export const myOrderGet = async (req: Request, res: Response) => {
         result: orders,
     })
 }
-export const myOrderGetById = async (req: Request, res: Response) => {
+export const orderContentGetById = async (req: Request, res: Response) => {
     const { id } = req.params
     const { user } = req
 
@@ -55,17 +63,145 @@ export const myOrderGetById = async (req: Request, res: Response) => {
         result: order,
     })
 }
-export const myOrderPost = async (req: Request, res: Response) => {
+// TODO AVOID IT
+export const evaluationGet = async (req: Request, res: Response) => {
+    const { id } = req.params
+    const { user } = req
+
+    const order = await Order.findOne({
+        $and: [{ _id: id }, { user: user._id }, { condition: 1 }],
+    }).populate({ path: 'book', select: 'name evaluation' })
+
+    if (!order) return resIdError(res)
+
+    res.status(200).json({
+        ok: true,
+        msg: [],
+        result: order,
+    })
+}
+export const evaluationConfirmGet = async (req: Request, res: Response) => {
+    const { id } = req.params
+    const { user } = req
+
+    const order = await Order.findOneAndUpdate(
+        {
+            $and: [{ _id: id }, { user: user._id }, { condition: 1 }],
+        },
+        {
+            condition: 2,
+        },
+        { new: true }
+    )
+
+    if (!order) return resIdError(res)
+
+    res.status(200).json({
+        ok: true,
+        msg: ['The evaluation was approved'],
+    })
+}
+
+export const preOrderGet = async (req: Request, res: Response) => {
+    const { id } = req.params
+    const { user } = req
+
+    const order = await Order.findOne({
+        $and: [{ _id: id }, { user: user._id }],
+    })
+        .select('book price condition')
+        .populate({ path: 'book', select: 'name image' })
+
+    if (!order) return resIdError(res)
+
+    res.status(200).json({
+        ok: true,
+        msg: [],
+        result: order,
+    })
+}
+export const checkoutPatch = async (req: Request, res: Response) => {
+    const { id } = req.params
+    const { user } = req
+    const { token } = req.body
+
+    const order = await Order.findOne({
+        $and: [{ _id: id }, { user: user._id }],
+    })
+
+    if (!order) return resIdError(res)
+
+    try {
+        const paymentMethod = await generatePaymentMethod(token)
+
+        const paymentIntent = await generatePaymentIntent({
+            price: order.price,
+            user,
+            payment_method: paymentMethod.id,
+        })
+        await Order.findOneAndUpdate(
+            { _id: id },
+            { stripeId: paymentIntent.id }
+        )
+        return res.status(200).json({
+            ok: true,
+            msg: [],
+            result: paymentIntent,
+        })
+    } catch (e) {
+        console.log(e)
+        return res.status(400).json({
+            ok: true,
+            msg: [],
+        })
+    }
+}
+export const checkoutConfirmGet = async (req: Request, res: Response) => {
+    const { id } = req.params
+    const { user } = req
+
+    const order = await Order.findOne({
+        $and: [{ _id: id }, { user: user._id }],
+    })
+
+    if (!order) return resIdError(res)
+
+    try {
+        const detailStripe = await getPaymentDetail(order.stripeId!)
+
+
+        console.log(detailStripe)
+        const condition = detailStripe.status.includes('succe') ? 1 : 4
+
+        await Order.findOneAndUpdate(
+            {
+                $and: [{ _id: id }, { user: user._id }],
+            },
+            { condition },
+        )
+
+        return res.status(200).json({
+            ok: true,
+            msg: [],
+            result: detailStripe
+        })
+    } catch (e) {
+        return res.status(400).json({
+            ok: false,
+            msg: ['Something wrong have happend'],
+        })
+    }
+}
+export const checkoutPost = async (req: Request, res: Response) => {
     const { user } = req
     const { id } = req.params
     const { price, addressLTC } = req.body
 
     const bookExist = await Book.findOne({
-        $and: [{ id }, { state: true }],
-    })
+        $and: [{ _id: id }, { state: true }],
+    }).select('maxPrice minPrice')
 
     if (!bookExist) return resIdError(res)
-
     if (price > bookExist.maxPrice || price < bookExist.minPrice) {
         return res.status(400).json({
             ok: false,
@@ -78,61 +214,14 @@ export const myOrderPost = async (req: Request, res: Response) => {
         price,
         user,
         addressLTC,
-        condition: 1,
+        condition: 0,
     })
 
     await order.save()
     res.status(201).json({
         ok: true,
         msg: ['The order was purchased'],
-    })
-}
-export const myEvaluationGetById = async (req: Request, res: Response) => {
-    const { id } = req.params
-    const { user } = req
-
-    const order = await Order.findOne({
-        $and: [
-            { _id: id },
-            { user: user._id },
-            { state: true },
-            { condition: 1 },
-        ],
-    }).populate({ path: 'book', select: 'name evaluation' })
-
-    if (!order) return resIdError(res)
-
-    res.status(200).json({
-        ok: true,
-        msg: [],
-        result: order,
-    })
-}
-export const myEvaluationPatch = async (req: Request, res: Response) => {
-    const { id } = req.params
-    const { user } = req
-
-    const order = await Order.findOneAndUpdate(
-        {
-            $and: [
-                { _id: id },
-                { user: user._id },
-                { state: true },
-                { condition: 1 },
-            ],
-        },
-        {
-            condition: 2,
-        },
-        { new: true }
-    )
-
-    if (!order) return resIdError(res)
-
-    res.status(200).json({
-        ok: true,
-        msg: [],
-        result: order,
+        result: order._id,
     })
 }
 

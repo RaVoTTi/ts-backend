@@ -1,13 +1,15 @@
 import { model, Schema, Document } from 'mongoose'
 
+
 export interface IOrder extends Document {
     user: string
-    state: boolean
     book: string
-    price: Number
+    price: number
     condition: number
     dateCreated: Date
     addressLTC:string
+    stripeId?:string
+
 }
 
 const orderSchema: Schema<IOrder> = new Schema({
@@ -16,10 +18,7 @@ const orderSchema: Schema<IOrder> = new Schema({
         ref: 'Book',
         required: true,
     },
-    state: {
-        type: Boolean,
-        default: true
-    },
+
     price: {
         type: Number,
         required: true,
@@ -36,6 +35,10 @@ const orderSchema: Schema<IOrder> = new Schema({
     addressLTC: {
         type: String,
         required: true,
+    },
+    stripeId:{
+        type: String,
+        default: null
     },
     dateCreated: {
         type: Date,

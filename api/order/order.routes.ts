@@ -9,8 +9,9 @@ import { validateCamps } from '../../middlewares/validate-camps'
 // CONTROLLERS
 import {
     myOrderGet,
-    myOrderGetById,
-    myOrderPost,
+    orderContentGetById,
+    checkoutPost,
+    checkoutConfirmGet,
     orderDelete,
     orderGet,
     orderGetById,
@@ -18,7 +19,10 @@ import {
     orderGetIncome,
     orderPost,
     orderPatch,
-    myEvaluationPatch,
+    preOrderGet,
+    evaluationGet,
+    evaluationConfirmGet,
+    checkoutPatch,
 } from './order.controllers'
 import { validateUserJwt } from '../../middlewares/validate-user-JWT'
 import { isAdminRole } from '../../middlewares/validate-admin-role'
@@ -29,39 +33,37 @@ export const router = Router()
 // ROUTES
 
 // NORMAL USER
+router.get('/user', [validateUserJwt], myOrderGet)
+
 router.get(
-    '/user',
-    [validateUserJwt],
-    myOrderGet
-)
-router.get(
-    '/user/:id',
+    '/content/:id',
     [
         validateUserJwt,
         check('id', "it isn't a valid id").isMongoId(),
         validateCamps,
     ],
-    myOrderGetById
+    orderContentGetById
 )
-router.patch(
+router.get(
     '/evaluation/:id',
     [
         validateUserJwt,
         check('id', "it isn't a valid id").isMongoId(),
-        check('result',"it isn't a valid id").notEmpty(),
-        check('result',"it isn't a valid id").isString(),
+        validateCamps,
+    ],
+    evaluationGet
+)
+router.get(
+    '/evaluation/confirm/:id',
+    [
+        validateUserJwt,
+        check('id', "it isn't a valid id").isMongoId(),
 
         validateCamps,
-        // check('result').custom(result =>{
-        //     if(result != 'zi4jba#cxlkNMzI' ){
-        //         return Promise.reject('The evaluation is Wrong');
-        //     }
-        // }),
-        // validateCamps,
-
     ],
-    myEvaluationPatch
+    evaluationConfirmGet
 )
+
 router.post(
     '/checkout/:id',
     [
@@ -74,7 +76,39 @@ router.post(
         check('price', "it isn't a valid price").isNumeric(),
         validateCamps,
     ],
-    myOrderPost
+    checkoutPost
+)
+router.get(
+    '/preorder/:id',
+    [
+        validateUserJwt,
+        check('id', "it isn't a valid id").isMongoId(),
+        validateCamps,
+    ],
+    preOrderGet
+)
+router.patch(
+    '/checkout/:id',
+    [
+        validateUserJwt,
+        check('id', "it isn't a valid id").isMongoId(),
+        check('token', "it isn't a valid token").notEmpty(),
+        check('token', "it isn't a valid token").isString(),
+        validateCamps,
+    ],
+    checkoutPatch
+)
+
+router.get(
+    '/checkout/confirm/:id',
+    [
+        validateUserJwt,
+        check('id', "it isn't a valid id").isMongoId(),
+
+
+        validateCamps,
+    ],
+    checkoutConfirmGet
 )
 
 // ADMIN

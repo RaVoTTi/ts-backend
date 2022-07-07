@@ -19,7 +19,7 @@ export const validateUserJwt = async (
     }
 
     try {
-        if (!process.env.PRIVATEKEY) {
+        if (!process.env.PRIVATE_KEY) {
             return res.status(500).json({
                 ok: false,
                 msg: ["Private Key doesn't exist"],
@@ -27,7 +27,7 @@ export const validateUserJwt = async (
             })
         }
 
-        const payload = jwt.verify(token, process.env.PRIVATEKEY) as JwtPayload
+        const payload = jwt.verify(token, process.env.PRIVATE_KEY) as JwtPayload
 
         // console.log(payload);
         const { uid } = payload

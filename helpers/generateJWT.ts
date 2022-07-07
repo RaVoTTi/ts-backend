@@ -10,7 +10,7 @@ export const generateJWT = (uid : string, isAdmin: boolean) =>{
 
     return new Promise((resolve, reject) =>{
         
-        const key = process.env.PRIVATEKEY || ''
+        const key = process.env.PRIVATE_KEY || ''
         if (key === '' ){
             reject("Private key isn't valid")
         }
